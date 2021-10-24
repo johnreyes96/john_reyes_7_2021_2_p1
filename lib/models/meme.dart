@@ -29,7 +29,7 @@ class Meme {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['submission_id'] = submissionId;
     data['submission_url'] = submissionUrl;
     data['submission_title'] = submissionTitle;

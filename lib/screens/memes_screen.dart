@@ -1,4 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:memes_app/components/loader_component.dart';
 import 'package:memes_app/helpers/api_helper.dart';
@@ -45,7 +46,7 @@ class _MemesScreenState extends State<MemesScreen> {
         ]
       ),
       body: Center(
-        child: _showLoader ? LoaderComponent(text: 'Cargando...') : _getContent()
+        child: _showLoader ? const LoaderComponent(text: 'Cargando...') : _getContent()
       )
     );
   }
@@ -54,6 +55,23 @@ class _MemesScreenState extends State<MemesScreen> {
     setState(() {
       _showLoader = true;
     });
+
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _showLoader = false;
+      });
+
+      await showAlertDialog(
+        context: context,
+        title: 'Error',
+        message: 'Verifica que estés conectado a internet.',
+        actions: <AlertDialogAction>[
+          const AlertDialogAction(key: null, label: 'Aceptar')
+        ]
+      );
+      return;
+    }
 
     Response response = await ApiHelper.getMemes();
 
