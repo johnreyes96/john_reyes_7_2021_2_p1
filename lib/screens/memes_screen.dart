@@ -28,7 +28,7 @@ class _MemesScreenState extends State<MemesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Colors.grey[850],
       appBar: AppBar(
         title: const Text('Memes'),
         backgroundColor: Colors.grey[900],
