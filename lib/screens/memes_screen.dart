@@ -123,25 +123,17 @@ class _MemesScreenState extends State<MemesScreen> {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                meme.submissionTitle, 
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold
-                                ),
-                              )
-                            ]
-                          )
-                        ]
+                      child: Text(
+                        meme.submissionTitle, 
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold
+                        ),
+                        overflow: TextOverflow.clip,
                       )
                     )
                   ),
-                  Icon(Icons.arrow_forward_ios)
+                  const Icon(Icons.arrow_forward_ios)
                 ]
               )
             )
