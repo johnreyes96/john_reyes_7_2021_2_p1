@@ -16,6 +16,8 @@ class MemesScreen extends StatefulWidget {
 class _MemesScreenState extends State<MemesScreen> {
   List<Meme> _memes = [];
   bool _showLoader = false;
+  bool _isFiltered = false;
+  String _search = '';
 
   @override
   void initState() {
@@ -26,9 +28,21 @@ class _MemesScreenState extends State<MemesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[900],
       appBar: AppBar(
         title: const Text('Memes'),
-
+        backgroundColor: Colors.grey[900],
+        actions: <Widget>[
+          _isFiltered
+          ? IconButton(
+              onPressed: _removeFilter, 
+              icon: const Icon(Icons.filter_none)
+            )
+          : IconButton(
+              onPressed: _showFilter, 
+              icon: const Icon(Icons.filter_alt)
+            )
+        ]
       ),
       body: Center(
         child: _showLoader ? LoaderComponent(text: 'Cargando...') : _getContent()
@@ -36,7 +50,7 @@ class _MemesScreenState extends State<MemesScreen> {
     );
   }
 
-  Future<Null> _getMemes() async {
+  Future<void> _getMemes() async {
     setState(() {
       _showLoader = true;
     });
@@ -92,16 +106,15 @@ class _MemesScreenState extends State<MemesScreen> {
           child: InkWell(
             onTap: () => _goDetailMeme(meme),
             child: Container(
-              margin: const EdgeInsets.all(10),
-              padding: const EdgeInsets.all(5),
+              margin: const EdgeInsets.all(5),
               child: Row(
                 children: [
                   ClipRRect(
                     child: !validateImage(meme.submissionUrl)
                       ? const Image(
                           image: AssetImage('assets/no-image.png'),
-                          width: 80,
-                          height: 80,
+                          width: 90,
+                          height: 90,
                           fit: BoxFit.fill,
                         )
                       : FadeInImage(
@@ -110,13 +123,13 @@ class _MemesScreenState extends State<MemesScreen> {
                           imageErrorBuilder: (context, error, stackTrace) {
                             return Image.asset(
                               'assets/deleted-image.png',
-                              width: 80,
-                              height: 80,
+                              width: 90,
+                              height: 90,
                               fit: BoxFit.fitWidth,
                             );
                           },
-                          width: 80,
-                          height: 80,
+                          width: 90,
+                          height: 90,
                           fit: BoxFit.fill
                         ),
                   ),
@@ -157,12 +170,79 @@ class _MemesScreenState extends State<MemesScreen> {
   }
 
   bool validateImage(String urlImage) {
-    print(urlImage);
     var splitUrl = urlImage.split('.');
     var extension = splitUrl[splitUrl.length - 1];
     if (extension == "png" || extension == "jpg" || extension == "gif") {
       return true;
     }
     return false;
+  }
+
+  void _removeFilter() {
+    setState(() {
+      _isFiltered = false;
+    });
+
+    _getMemes();
+  }
+
+  void _showFilter() {
+    showDialog(
+      context: context, 
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          backgroundColor: Colors.grey[300],
+          title: const Text('Filtrar Meme'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text('Escriba las primeras letras del título del meme'),
+              const SizedBox(height: 10,),
+              TextField(
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Criterio de búsqueda...',
+                  labelText: 'Buscar',
+                  suffixIcon: Icon(Icons.search)
+                ),
+                onChanged: (value) {
+                  _search = value;
+                },
+              )
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), 
+              child: const Text('Cancelar')
+            ),
+            TextButton(
+              onPressed: () => _filter(), 
+              child: const Text('Filtrar')
+            ),
+          ],
+        );
+      });
+  }
+
+  void _filter() {
+    if (_search.isEmpty) return;
+
+    List<Meme> filteredList = [];
+    for (Meme meme in _memes) {
+      if (meme.submissionTitle.toLowerCase().contains(_search.toLowerCase())) {
+        filteredList.add(meme);
+      }
+    }
+
+    setState(() {
+      _memes = filteredList;
+      _isFiltered = true;
+    });
+
+    Navigator.of(context).pop();
   }
 }
